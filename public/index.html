@@ -18,9 +18,56 @@
       <a href="new_store_form.html"
         ><button id="add-store-btn">Add Store</button></a
       >
+
+      <form id="edit-store-form">
+        <div>
+          <h3>Name:</h3>
+          <input
+            type="text"
+            id="edit-store-name"
+            placeholder="Store Name"
+            required
+          />
+        </div>
+        <div>
+          <h3>Location:</h3>
+          <input
+            type="text"
+            id="edit-store-location"
+            placeholder="Store Location"
+            required
+          />
+        </div>
+        <div>
+          <h3>Address:</h3>
+          <input
+            type="text"
+            id="edit-store-address"
+            placeholder="Store Address"
+          />
+        </div>
+        <div>
+          <h3>Hours:</h3>
+          <input type="text" id="edit-store-hours" placeholder="Store Hours" />
+        </div>
+        <div>
+          <h3>Rating:</h3>
+          <input
+            type="number"
+            id="edit-store-rating"
+            placeholder="Store Rating (0-5)"
+            min="0"
+            max="5"
+          />
+        </div>
+
+        <button type="submit">Update Store</button>
+        <button type="button" onclick="window.location.href = 'index.html';">
+          Cancel
+        </button>
+      </form>
     </div>
 
     <script src="script.js"></script>
-    <script src="edit-store-form.js"></script>
   </body>
 </html>

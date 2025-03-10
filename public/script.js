@@ -8,15 +8,19 @@ async function loadStores() {
     const venueList = document.getElementById("venue-list");
     venueList.innerHTML = '';  // Clear the list before rendering
 
+    const editForm = document.getElementById("edit-store-form");
+    editForm.style.display = 'none'; // Hide the form
+
+
     stores.forEach(store => {
         const li = document.createElement("li");
         li.classList.add("venue-item");
 
         li.innerHTML = `
             <span onclick="editStore('${store.name}')">${store.name} - ${store.district}</span>
-            <button onclick="editStore('${store.name}')">Details</button>
             <button onclick="deleteStore('${store.name}')">Delete</button>
         `;
+        //<button onclick="editStore('${store.name}')">Details</button>
 
         venueList.appendChild(li);
     });
@@ -50,36 +54,55 @@ async function addStore() {
 // Edit an existing store
 async function editStore(storeName) {
     console.log(`Editing store: ${storeName}`); // Log store name
-    const response = await fetch(`http://localhost:5000/api/stores/${storeName}`);
-    const store = await response.json();
+    const response = await fetch(`http://localhost:5000/api/stores/${storeName}`, {
+        method: "PUT",
+    });
 
-    // Clear store list and render the specific store details
-    const venueList = document.getElementById("container");
-    venueList.innerHTML = '';  // Clear the list before rendering
-    storeDetails(storeName);
+    if (response.ok) {
+        const store = await response.json();
+
+        const venueList = document.getElementById("venue-list");
+        venueList.innerHTML = '';  // Clear the list before rendering
+
+        const editForm = document.getElementById("edit-store-form");
+        editForm.style.display = 'block'; // Show the form
+
+        // Populate the form fields with the store's current data
+        console.log(store);
+        document.getElementById("edit-store-name").value = store.name;
+        document.getElementById("edit-store-location").value = store.district || '';
+        document.getElementById("edit-store-address").value = store.address || '';
+        document.getElementById("edit-store-hours").value = store.hours || '';
+        document.getElementById("edit-store-rating").value = store.rating || '';
+    } else {
+        alert('Error editing store');
+    }
+
+    //const editForm = document.getElementById("edit-store-form");
+    //editForm.style.display = 'block'; // Show the form
 
     // Populate the form fields with the store's current data
-    document.getElementById("edit-store-name").value = store.name;
-    document.getElementById("edit-store-location").value = store.district || '';
-    document.getElementById("edit-store-address").value = store.address || '';
-    document.getElementById("edit-store-hours").value = store.hours || '';
-    document.getElementById("edit-store-rating").value = store.rating || '';
+    // document.getElementById("edit-store-name").value = store.name;
+    // document.getElementById("edit-store-location").value = store.district || '';
+    // document.getElementById("edit-store-address").value = store.address || '';
+    // document.getElementById("edit-store-hours").value = store.hours || '';
+    // document.getElementById("edit-store-rating").value = store.rating || '';
 
-    // Change the form title and store name
-    document.getElementById("edit-form-title").innerText = "Edit Store";
-    currentStoreName = storeName; // Store the name of the store being edited
+    // // Change the form title and store name
+    // document.getElementById("edit-form-title").innerText = "Edit Store";
+    // currentStoreName = storeName; // Store the name of the store being edited
 
-    // Make the form visible
-    document.getElementById("edit-store-form").style.display = 'block'; // Show the form
+    // // Make the form visible
+    // document.getElementById("edit-store-form").style.display = 'block'; // Show the form
 }
 
 // Save the edited store
 async function saveStore() {
-    const name = document.getElementById("store-name").value;
-    const location = document.getElementById("store-location").value;
-    const address = document.getElementById("store-address").value;
-    const hours = document.getElementById("store-hours").value;
-    const rating = document.getElementById("store-rating").value;
+    const name = document.getElementById("updated-store-name").value;
+    const location = document.getElementById("updated-store-location").value;
+    const address = document.getElementById("updated-store-address").value;
+    const hours = document.getElementById("updated-store-hours").value;
+    const rating = document.getElementById("updated-store-rating").value;
 
     const updatedStore = { name, district: location, address, hours, rating };
 

@@ -3,11 +3,17 @@ document.getElementById('store-form').addEventListener('submit', async (event) =
 
     const name = document.getElementById('store-name').value;
     const district = document.getElementById('store-location').value;
+    const address = document.getElementById('store-address').value;
+    const hours = document.getElementById('store-hours').value;
+    const rating = document.getElementById('store-rating').value;
 
     // Prepare the data to be sent to the server
     const storeData = {
         name: name,
-        district: district
+        district: district,
+        address: address,
+        hours: hours,
+        rating: rating
     };
 
     try {
