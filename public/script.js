@@ -21,18 +21,15 @@ async function loadStores() {
     stores.forEach(store => {
         const li = document.createElement("li");
         li.classList.add("venue-item");
-        li.onclick = function () {
-            editStore(store.name);
-        };
 
         if (store.district !== null) {
             li.innerHTML = `
-            <span>${store.name} - ${store.district}</span>
+            <span onclick="editStore('${store.name}');">${store.name} - ${store.district}</span>
             <button onclick="deleteStore('${store.name}')">Delete</button>
         `;
         } else {
             li.innerHTML = `
-            <span>${store.name}</span>
+            <span onclick="editStore('${store.name}');">${store.name}</span>
             <button onclick="deleteStore('${store.name}')">Delete</button>
         `;
         }
