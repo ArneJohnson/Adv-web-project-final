@@ -5,6 +5,15 @@ async function loadStores() {
     const response = await fetch("http://localhost:5000/api/stores");
     const stores = await response.json();
 
+    // Sort stores
+    const sortMethod = checkSort();
+    if (sortMethod === "rating") {  // Sort by rating
+        stores.sort((a, b) => b.rating - a.rating);
+    } else if (sortMethod === "name") {  // Sort by name
+        stores.sort((a, b) => b.name.localeCompare(a.name));
+    }
+    console.log(stores);
+
     const venueList = document.getElementById("venue-list");
     venueList.innerHTML = '';  // Clear the list before rendering
 
@@ -149,15 +158,27 @@ document.getElementById("add-store-btn").addEventListener("click", function () {
     document.getElementById("add-store-form").style.display = 'block';
 });
 
-// Sorting buttons
+// Store Sorting
 function sortByRating() {
     document.getElementById("sortByRating").classList.toggle("active");
     document.getElementById("sortByName").classList.remove("active");
+    loadStores();
 }
 
 function sortByName() {
     document.getElementById("sortByName").classList.toggle("active");
     document.getElementById("sortByRating").classList.remove("active");
+    loadStores();
+}
+
+function checkSort() {
+    if (document.getElementById("sortByRating").classList.contains("active")) {
+        return "rating";
+    } else if (document.getElementById("sortByName").classList.contains("active")) {
+        return "name";
+    } else {
+        return null;
+    }
 }
 
 // Load stores when the page is loaded
