@@ -13,8 +13,8 @@ async function loadStores() {
         li.classList.add("venue-item");
 
         li.innerHTML = `
-            <span>${store.name} - ${store.district}</span>
-            <button onclick="editStore('${store.name}')">Edit</button>
+            <span onclick="editStore('${store.name}')">${store.name} - ${store.district}</span>
+            <button onclick="editStore('${store.name}')">Details</button>
             <button onclick="deleteStore('${store.name}')">Delete</button>
         `;
 
@@ -53,19 +53,24 @@ async function editStore(storeName) {
     const response = await fetch(`http://localhost:5000/api/stores/${storeName}`);
     const store = await response.json();
 
+    // Clear store list and render the specific store details
+    const venueList = document.getElementById("container");
+    venueList.innerHTML = '';  // Clear the list before rendering
+    storeDetails(storeName);
+
     // Populate the form fields with the store's current data
-    document.getElementById("store-name").value = store.name;
-    document.getElementById("store-location").value = store.district || '';
-    document.getElementById("store-address").value = store.address || '';
-    document.getElementById("store-hours").value = store.hours || '';
-    document.getElementById("store-rating").value = store.rating || '';
+    document.getElementById("edit-store-name").value = store.name;
+    document.getElementById("edit-store-location").value = store.district || '';
+    document.getElementById("edit-store-address").value = store.address || '';
+    document.getElementById("edit-store-hours").value = store.hours || '';
+    document.getElementById("edit-store-rating").value = store.rating || '';
 
     // Change the form title and store name
-    document.getElementById("form-title").innerText = "Edit Store";
+    document.getElementById("edit-form-title").innerText = "Edit Store";
     currentStoreName = storeName; // Store the name of the store being edited
 
     // Make the form visible
-    document.getElementById("add-store-form").style.display = 'block'; // Show the form
+    document.getElementById("edit-store-form").style.display = 'block'; // Show the form
 }
 
 // Save the edited store
