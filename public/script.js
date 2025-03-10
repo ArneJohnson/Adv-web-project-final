@@ -21,19 +21,18 @@ async function loadStores() {
     stores.forEach(store => {
         const li = document.createElement("li");
         li.classList.add("venue-item");
+        li.onclick = function () {
+            editStore(store.name);
+        };
 
-        // li.innerHTML = `
-        //     <span onclick="editStore('${store.name}')">${store.name} - ${store.district}</span>
-        //     <button onclick="deleteStore('${store.name}')">Delete</button>
-        // `;
         if (store.district !== null) {
             li.innerHTML = `
-            <span onclick="editStore('${store.name}')">${store.name} - ${store.district}</span>
+            <span>${store.name} - ${store.district}</span>
             <button onclick="deleteStore('${store.name}')">Delete</button>
         `;
         } else {
             li.innerHTML = `
-            <span onclick="editStore('${store.name}')">${store.name}</span>
+            <span>${store.name}</span>
             <button onclick="deleteStore('${store.name}')">Delete</button>
         `;
         }
@@ -60,7 +59,6 @@ async function addStore() {
 
     if (response.ok) {
         loadStores(); // Reload the stores after adding a new one
-        //cancelAddStore(); // Hide the form
         window.location.href = 'index.html'; // Redirect to the index page after adding a store
     } else {
         alert('Error adding store');
@@ -125,7 +123,6 @@ async function saveStore() {
 
     if (response.ok) {
         loadStores(); // Reload the stores after updating
-        //cancelAddStore(); // Hide the form
     } else {
         alert('Error updating store');
     }
@@ -148,22 +145,23 @@ async function deleteStore(storeName) {
     }
 }
 
-// Hide the form for adding/editing a store
-// function cancelAddStore() {
-//     document.getElementById("add-store-form").style.display = 'none';
-//     document.getElementById("store-name").value = '';
-//     document.getElementById("store-location").value = '';
-//     document.getElementById("store-address").value = '';
-//     document.getElementById("store-hours").value = '';
-//     document.getElementById("store-rating").value = '';
-// }
-
 // Open the form for adding a new store
 document.getElementById("add-store-btn").addEventListener("click", function () {
     currentStoreName = '';
     document.getElementById("form-title").innerText = "Add a New Store";
     document.getElementById("add-store-form").style.display = 'block';
 });
+
+// Sorting buttons
+function sortByRating() {
+    document.getElementById("sortByRating").classList.toggle("active");
+    document.getElementById("sortByName").classList.remove("active");
+}
+
+function sortByName() {
+    document.getElementById("sortByName").classList.toggle("active");
+    document.getElementById("sortByRating").classList.remove("active");
+}
 
 // Load stores when the page is loaded
 loadStores();

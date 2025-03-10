@@ -164,6 +164,8 @@ h2 {
   cursor: pointer;
   transition: transform 0.1s, background 0.2s;
   font-size: 1.2rem;
+  display: flex;
+  justify-content: space-between;
 }
 
 .venue-item:hover {
@@ -172,7 +174,8 @@ h2 {
   color: black;
 }
 
-.venue-item button {
+.venue-item span {
+  margin: auto;
 }
 
 /* Form Styles */
@@ -229,6 +232,13 @@ button {
 
 button:hover {
   background: #ffcc00;
+  color: black;
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0 black;
+}
+
+button.active {
+  background: #ff8800;
   color: black;
   transform: translate(-2px, -2px);
   box-shadow: 8px 8px 0 black;
