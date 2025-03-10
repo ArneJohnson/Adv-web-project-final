@@ -172,6 +172,9 @@ h2 {
   color: black;
 }
 
+.venue-item button {
+}
+
 /* Form Styles */
 form {
   display: flex;
@@ -236,11 +239,16 @@ button:active {
   box-shadow: 4px 4px 0 black;
 }
 
-#edit-store-form {
+#edit-store-form,
+#store-form {
   margin: auto;
   margin-top: 50px;
 }
 
 #edit-store-form div {
+  margin: 20px;
+}
+
+#add-store-btn {
   margin: 20px;
 }

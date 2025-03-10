@@ -10,14 +10,25 @@
     <div class="hero" id="hero">
       <a href="/"><h1>Discover Jönköping</h1></a>
       <p id="adminHelp">*Click on the stores to edit them</p>
-    </div>
-
-    <div class="container">
-      <h2>Stores</h2>
-      <ul id="venue-list"></ul>
       <a href="new_store_form.html"
         ><button id="add-store-btn">Add Store</button></a
       >
+      <div id="sortButtons">
+        <button id="sortByRating" onclick="sortByRating()">
+          Sort by Rating
+        </button>
+        <button id="sortByName" onclick="sortByName()">Sort by Name</button>
+        <button id="sortByLocation" onclick="sortByLocation()">
+          Sort by Location
+        </button>
+      </div>
+    </div>
+
+    <div class="container">
+      <h2 id="store-header">Stores</h2>
+      <h2 id="name-header"></h2>
+
+      <ul id="venue-list"></ul>
 
       <form id="edit-store-form">
         <div>

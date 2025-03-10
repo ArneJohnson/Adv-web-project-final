@@ -11,16 +11,32 @@ async function loadStores() {
     const editForm = document.getElementById("edit-store-form");
     editForm.style.display = 'none'; // Hide the form
 
+    const nameHeader = document.getElementById("name-header");
+    nameHeader.innerText = ``;
+    nameHeader.style.display = 'none'; // Hide the store name
+
+    const addStoreButton = document.getElementById("add-store-btn");
+    addStoreButton.style.display = 'block'; // Show the add store button
 
     stores.forEach(store => {
         const li = document.createElement("li");
         li.classList.add("venue-item");
 
-        li.innerHTML = `
+        // li.innerHTML = `
+        //     <span onclick="editStore('${store.name}')">${store.name} - ${store.district}</span>
+        //     <button onclick="deleteStore('${store.name}')">Delete</button>
+        // `;
+        if (store.district !== null) {
+            li.innerHTML = `
             <span onclick="editStore('${store.name}')">${store.name} - ${store.district}</span>
             <button onclick="deleteStore('${store.name}')">Delete</button>
         `;
-        //<button onclick="editStore('${store.name}')">Details</button>
+        } else {
+            li.innerHTML = `
+            <span onclick="editStore('${store.name}')">${store.name}</span>
+            <button onclick="deleteStore('${store.name}')">Delete</button>
+        `;
+        }
 
         venueList.appendChild(li);
     });
@@ -44,7 +60,7 @@ async function addStore() {
 
     if (response.ok) {
         loadStores(); // Reload the stores after adding a new one
-        cancelAddStore(); // Hide the form
+        //cancelAddStore(); // Hide the form
         window.location.href = 'index.html'; // Redirect to the index page after adding a store
     } else {
         alert('Error adding store');
@@ -68,6 +84,16 @@ async function editStore(storeName) {
 
         const editForm = document.getElementById("edit-store-form");
         editForm.style.display = 'block'; // Show the form
+
+        const nameHeader = document.getElementById("name-header");
+        nameHeader.innerText = `${storeName}`;
+        nameHeader.style.display = 'block'; // Show the store name
+
+        const storeHeader = document.getElementById("store-header");
+        storeHeader.style.display = 'none'; // Hide the store header
+
+        const addStoreButton = document.getElementById("add-store-btn");
+        addStoreButton.style.display = 'none'; // Hide the add store button
 
         // Populate the form fields with the store's current data
         console.log(store);
@@ -99,7 +125,7 @@ async function saveStore() {
 
     if (response.ok) {
         loadStores(); // Reload the stores after updating
-        cancelAddStore(); // Hide the form
+        //cancelAddStore(); // Hide the form
     } else {
         alert('Error updating store');
     }
@@ -123,14 +149,14 @@ async function deleteStore(storeName) {
 }
 
 // Hide the form for adding/editing a store
-function cancelAddStore() {
-    document.getElementById("add-store-form").style.display = 'none';
-    document.getElementById("store-name").value = '';
-    document.getElementById("store-location").value = '';
-    document.getElementById("store-address").value = '';
-    document.getElementById("store-hours").value = '';
-    document.getElementById("store-rating").value = '';
-}
+// function cancelAddStore() {
+//     document.getElementById("add-store-form").style.display = 'none';
+//     document.getElementById("store-name").value = '';
+//     document.getElementById("store-location").value = '';
+//     document.getElementById("store-address").value = '';
+//     document.getElementById("store-hours").value = '';
+//     document.getElementById("store-rating").value = '';
+// }
 
 // Open the form for adding a new store
 document.getElementById("add-store-btn").addEventListener("click", function () {
