@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jönköping City - Store Form</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="hero">
+        <h1>Discover Jönköping</h1>
+    </div>
+
+    <div class="container">
+        <h2>Store Form</h2>
+
+        <form id="store-form">
+            <h3 id="form-title">Add a New Store</h3>
+            <input type="text" id="store-name" placeholder="Store Name" required />
+            <input type="text" id="store-location" placeholder="Store Location" required />
+            <input type="text" id="store-address" placeholder="Store Address" />
+            <input type="text" id="store-hours" placeholder="Store Hours" />
+            <input type="number" id="store-rating" placeholder="Store Rating (0-5)" min="0" max="5" />
+
+            <button type="submit">Save Store</button>
+            <button type="button" onclick="cancelAddStore()">Cancel</button>
+        </form>
+
+    </div>
+    
+    <script src="new_store_form.js"></script>
+</body>
+</html>
