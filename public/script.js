@@ -61,6 +61,8 @@ async function editStore(storeName) {
     if (response.ok) {
         const store = await response.json();
 
+        currentStoreName = storeName; // Store the current store name
+
         const venueList = document.getElementById("venue-list");
         venueList.innerHTML = '';  // Clear the list before rendering
 
@@ -77,34 +79,17 @@ async function editStore(storeName) {
     } else {
         alert('Error editing store');
     }
-
-    //const editForm = document.getElementById("edit-store-form");
-    //editForm.style.display = 'block'; // Show the form
-
-    // Populate the form fields with the store's current data
-    // document.getElementById("edit-store-name").value = store.name;
-    // document.getElementById("edit-store-location").value = store.district || '';
-    // document.getElementById("edit-store-address").value = store.address || '';
-    // document.getElementById("edit-store-hours").value = store.hours || '';
-    // document.getElementById("edit-store-rating").value = store.rating || '';
-
-    // // Change the form title and store name
-    // document.getElementById("edit-form-title").innerText = "Edit Store";
-    // currentStoreName = storeName; // Store the name of the store being edited
-
-    // // Make the form visible
-    // document.getElementById("edit-store-form").style.display = 'block'; // Show the form
 }
 
 // Save the edited store
 async function saveStore() {
-    const name = document.getElementById("updated-store-name").value;
-    const location = document.getElementById("updated-store-location").value;
-    const address = document.getElementById("updated-store-address").value;
-    const hours = document.getElementById("updated-store-hours").value;
-    const rating = document.getElementById("updated-store-rating").value;
+    const name = document.getElementById("edit-store-name").value;
+    const location = document.getElementById("edit-store-location").value;
+    const address = document.getElementById("edit-store-address").value;
+    const hours = document.getElementById("edit-store-hours").value;
+    const rating = document.getElementById("edit-store-rating").value;
 
-    const updatedStore = { name, district: location, address, hours, rating };
+    const updatedStore = { name, location, address, hours, rating };
 
     const response = await fetch(`http://localhost:5000/api/stores/${currentStoreName}`, {
         method: "PUT",

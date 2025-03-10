@@ -584,6 +584,7 @@
     "district": "2",
     "address": "3",
     "hours": "4",
-    "rating": "5"
+    "rating": "1",
+    "location": "2"
   }
 ]

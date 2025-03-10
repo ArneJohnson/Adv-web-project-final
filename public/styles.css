@@ -82,3 +82,165 @@ h2 {
   background: #ffcc00;
   color: black;
 }
+
+/* General Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #f4f4f4;
+  color: #111;
+  font-family: "Courier New", Courier, monospace;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Hero Section */
+.hero {
+  width: 100%;
+  height: 40vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  border-bottom: 4px solid black;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  color: white;
+  background: black;
+  padding: 10px 20px;
+  text-transform: uppercase;
+  font-weight: 700;
+  border: 4px solid white;
+  box-shadow: 8px 8px 0 black;
+}
+
+.hero p {
+  margin-top: 50px;
+}
+
+a {
+  text-decoration: none;
+}
+
+/* Main Container */
+.container {
+  text-align: center;
+  padding: 2rem;
+  background: #fff;
+  border: 4px solid black;
+  box-shadow: 8px 8px 0 black;
+  width: 800px;
+  margin-top: 20px;
+}
+
+/* Title */
+h2 {
+  font-size: 1.8rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  border-bottom: 4px solid black;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+/* List of Venues */
+#venue-list {
+  list-style: none;
+}
+
+.venue-item {
+  background: black;
+  color: white;
+  padding: 10px;
+  margin: 5px 0;
+  cursor: pointer;
+  transition: transform 0.1s, background 0.2s;
+  font-size: 1.2rem;
+}
+
+.venue-item:hover {
+  transform: scale(1.05);
+  background: #ffcc00;
+  color: black;
+}
+
+/* Form Styles */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background: #fff;
+  padding: 20px;
+  border: 4px solid black;
+  box-shadow: 8px 8px 0 black;
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+}
+
+form h3 {
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  border-bottom: 4px solid black;
+  padding-bottom: 10px;
+}
+
+input {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 1rem;
+  padding: 10px;
+  border: 3px solid black;
+  box-shadow: 4px 4px 0 black;
+  outline: none;
+  width: 100%;
+}
+
+input:focus {
+  border-color: #ffcc00;
+  box-shadow: 4px 4px 0 #ffcc00;
+}
+
+/* Button Styles */
+button {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  background: black;
+  color: white;
+  border: 4px solid white;
+  padding: 12px 24px;
+  cursor: pointer;
+  box-shadow: 6px 6px 0 black;
+  transition: transform 0.1s, background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+button:hover {
+  background: #ffcc00;
+  color: black;
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0 black;
+}
+
+button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 4px 4px 0 black;
+}
+
+#edit-store-form {
+  margin: auto;
+  margin-top: 50px;
+}
+
+#edit-store-form div {
+  margin: 20px;
+}
