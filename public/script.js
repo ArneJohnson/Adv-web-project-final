@@ -182,11 +182,11 @@ async function deleteStore(storeName) {
 }
 
 // Open the form for adding a new store
-document.getElementById("add-store-btn").addEventListener("click", function () {
-    currentStoreName = '';
-    document.getElementById("form-title").innerText = "Add a New Store";
-    document.getElementById("add-store-form").style.display = 'block';
-});
+// document.getElementById("add-store-btn").addEventListener("click", function () {
+//     currentStoreName = '';
+//     document.getElementById("form-title").innerText = "Add a New Store";
+//     document.getElementById("add-store-form").style.display = 'block';
+// });
 
 // Store Sorting
 function sortByRating() {

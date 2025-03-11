@@ -31,13 +31,13 @@ function readStores() {
 }
 
 // Function to write stores to the JSON file
-function writeStores(stores) {
-    try {
-        fs.writeFileSync(storesFilePath, JSON.stringify(stores, null, 2), 'utf8');
-    } catch (err) {
-        console.error('Error writing stores file:', err);
-    }
-}
+// function writeStores(stores) {
+//     try {
+//         fs.writeFileSync(storesFilePath, JSON.stringify(stores, null, 2), 'utf8');
+//     } catch (err) {
+//         console.error('Error writing stores file:', err);
+//     }
+// }
 
 // Login Route
 app.get('/login', (req, res) => {
@@ -88,6 +88,19 @@ app.get('/api/stores', (req, res) => {
     const stores = readStores();
     res.json(stores);
 });
+
+// GET: Fetch all stores
+// app.get('/api/stores', async (req, res) => {
+//     try {
+//         const result = await pool.query('SELECT * FROM stores;');
+//         res.json(result.rows);
+//         console.log(result.rows);
+//     } catch (err) {
+//         console.error('Error fetching stores:', err);
+//         res.status(500).json({ message: 'Internal Server Error' });
+//     }
+// });
+
 
 // POST endpoint to add a new store to the stores.json file
 app.post('/api/stores', (req, res) => {
