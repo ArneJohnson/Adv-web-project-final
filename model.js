@@ -1,56 +1,54 @@
-const { Pool } = require("pg");
-const fs = require('fs');
-require('dotenv').config(); // Load environment variables from .env file
+const express = require('express');
+const bodyParser = require('body-parser');
+const { Pool } = require('pg');
 
-// Create a new PostgreSQL connection pool
+// Create an Express application
+const app = express();
+
+// Middleware to parse JSON bodies
+app.use(bodyParser.json());
+
+// PostgreSQL pool setup
 const pool = new Pool({
-    host: "database",  // Use the service name from docker-compose.yml
-    port: 5432,        // Port for PostgreSQL
-    user: "postgres",  // PostgreSQL username
-    password: "12345", // PostgreSQL password
-    database: "postgres" // PostgreSQL database name
+    host: "database",
+    port: 5432,
+    user: "postgres",
+    password: "12345",
+    database: "postgres"
 });
 
-async function testConnection() {
-  try {
-    const res = await pool.query("SELECT NOW();");
-    console.log("Database connected!");
-  } catch (err) {
-    console.error("Database connection error:", err);
-  }
-}
+// Handle POST request to insert a new store
+app.post('/api/stores', async (req, res) => {
+    const { name, district, url, hours, rating } = req.body;
 
-// Function to insert stores into the database
-async function insertStores() {
-  try {
-    // Read the stores.json file (updated path)
-    const data = fs.readFileSync('/usr/src/app/stores.json', 'utf8');
+    try {
+        // Query to insert the store data into the database
+        const query = `
+            INSERT INTO stores (name, district, url, hours, rating)
+            VALUES ($1, $2, $3, $4, $5)
+            ON CONFLICT (name) DO NOTHING;
+        `;
+        const values = [name, district, url, hours, rating];
 
-    // Parse the JSON data
-    const stores = JSON.parse(data);
+        // Execute the query using the pool
+        await pool.query(query, values);
+        console.log('Inserted store:', name);
 
-    // Loop through the stores and insert them into the database
-    for (const store of stores) {
-      const query = `
-        INSERT INTO stores (name, district, url, hours, rating)
-        VALUES ($1, $2, $3, $4, $5)
-        ON CONFLICT (name) DO NOTHING;
-      `;
-      const values = [store.name, store.district, store.address, store.hours, store.rating];
-
-      // Execute the query using the pool
-      await pool.query(query, values);
-      console.log('Inserted store:', store.name);
+        // Send a response back to the client
+        res.status(200).json({ message: 'Store added successfully!' });
+    } catch (err) {
+        console.error('Error inserting store:', err);
+        res.status(500).json({ message: 'Failed to add store. Please try again.' });
     }
-  } catch (err) {
-    console.error('Error inserting stores:', err);
-  } finally {
-    // Close the pool connection when done
-    await pool.end();
-  }
+});
+
+// Test connection and start the server
+async function testConnection() {
+    try {
+        const res = await pool.query("SELECT NOW();");
+        console.log("Database connected!");
+    } catch (err) {
+        console.error("Database connection error:", err);
+    }
 }
 
-// Test the connection and then insert stores
-testConnection().then(() => {
-  insertStores();
-});
