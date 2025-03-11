@@ -144,23 +144,47 @@ app.put('/api/stores/:name', async (req, res) => {
     }
 });
 
-// DELETE: Remove a store by name
 app.delete('/api/stores/:name', async (req, res) => {
     const token = req.signedCookies.authToken;
     if (token && sessions[token]) {
         const storeName = req.params.name;
 
         try {
+            // Log store name being deleted
+            console.log('Attempting to delete store with name:', storeName);
+
+            // Check if the store exists before attempting to delete
+            const checkStore = await pool.query('SELECT * FROM stores WHERE name = $1', [storeName]);
+            if (checkStore.rowCount === 0) {
+                console.log('Store not found!');
+                return res.status(404).json({ message: 'Store not found!' });
+            }
+
+            // Perform deletion
             const result = await pool.query(
                 'DELETE FROM stores WHERE name = $1 RETURNING *',
                 [storeName]
             );
 
+            // If no rows are deleted, something went wrong
             if (result.rowCount === 0) {
-                return res.status(404).json({ message: 'Store not found!' });
+                console.log('No store deleted, check constraints or query.');
+                return res.status(500).json({ message: 'Store deletion failed.' });
             }
 
+            // Log the result (deleted store)
+            console.log('Store deleted:', result.rows[0]);
+
+            // Return the deleted store
             res.json(result.rows[0]);
+
+            // Double-check by querying again
+            const verifyDeletion = await pool.query('SELECT * FROM stores WHERE name = $1', [storeName]);
+            if (verifyDeletion.rowCount === 0) {
+                console.log('Store successfully deleted from database.');
+            } else {
+                console.log('Store still exists after delete operation.');
+            }
         } catch (err) {
             console.error('Error deleting store:', err);
             res.status(500).json({ message: 'Internal Server Error' });

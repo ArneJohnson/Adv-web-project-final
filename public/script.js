@@ -81,9 +81,10 @@ async function addStore() {
 // Edit an existing store
 async function editStore(storeName) {
     console.log(`Editing store: ${storeName}`);
+    console.log("Store name:", storeName);
     try {
         const response = await fetch(`http://localhost:5000/api/stores/${storeName}`, {
-            method: "GET",
+            method: "PUT",
         });
 
         if (response.ok) {
@@ -110,7 +111,7 @@ async function editStore(storeName) {
             // Populate the form fields with the store's current data
             document.getElementById("edit-store-name").value = store.name;
             document.getElementById("edit-store-location").value = store.district || '';
-            document.getElementById("edit-store-address").value = store.address || '';
+            document.getElementById("edit-store-address").value = store.url || '';
             document.getElementById("edit-store-hours").value = store.hours || '';
             document.getElementById("edit-store-rating").value = store.rating || '';
         } else {
