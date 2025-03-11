@@ -83,95 +83,94 @@ app.post('/', (req, res) => {
     }
 });
 
-// GET endpoint to fetch all stores from the stores.json file
-app.get('/api/stores', (req, res) => {
-    const stores = readStores();
-    res.json(stores);
+// GET: Fetch all stores
+app.get('/api/stores', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM stores');
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Error fetching stores:', err);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
 });
 
-// GET: Fetch all stores
-// app.get('/api/stores', async (req, res) => {
-//     try {
-//         const result = await pool.query('SELECT * FROM stores;');
-//         res.json(result.rows);
-//         console.log(result.rows);
-//     } catch (err) {
-//         console.error('Error fetching stores:', err);
-//         res.status(500).json({ message: 'Internal Server Error' });
-//     }
-// });
-
-
-// POST endpoint to add a new store to the stores.json file
-app.post('/api/stores', (req, res) => {
+// POST: Add a new store
+app.post('/api/stores', async (req, res) => {
     const token = req.signedCookies.authToken;
     if (token && sessions[token]) {
         const { name, district, url, hours, rating } = req.body;
-
         if (!name || !district) {
-            return res.status(400).json({ message: 'Name and location are required!' });
+            return res.status(400).json({ message: 'Name and district are required!' });
         }
-
-        const newStore = { name, district, url, hours, rating };
-        const stores = readStores();
-        stores.push(newStore);
-        writeStores(stores); // Save the updated stores array back to the file
-
-        console.log('New store added:', newStore);
-        res.status(201).json(newStore);
+        try {
+            const result = await pool.query(
+                'INSERT INTO stores (name, district, url, hours, rating) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+                [name, district, url, hours, rating]
+            );
+            res.status(201).json(result.rows[0]);
+        } catch (err) {
+            console.error('Error adding store:', err);
+            res.status(500).json({ message: 'Internal Server Error' });
+        }
     } else {
         res.status(401).send('Login required to add a store');
     }
 });
 
-// PUT endpoint to update an existing store by name in the stores.json file
-app.put('/api/stores/:name', (req, res) => {
+// PUT: Update a store by name
+app.put('/api/stores/:name', async (req, res) => {
     const token = req.signedCookies.authToken;
     if (token && sessions[token]) {
         const storeName = req.params.name;
-        const updatedData = req.body;
+        const { district, url, hours, rating } = req.body;
 
-        const stores = readStores();
-        const storeIndex = stores.findIndex(store => store.name === storeName);
+        try {
+            const result = await pool.query(
+                'UPDATE stores SET district = COALESCE($1, district), url = COALESCE($2, url), hours = COALESCE($3, hours), rating = COALESCE($4, rating) WHERE name = $5 RETURNING *',
+                [district, url, hours, rating, storeName]
+            );
 
-        if (storeIndex === -1) {
-            return res.status(404).json({ message: 'Store not found!' });
+            if (result.rowCount === 0) {
+                return res.status(404).json({ message: 'Store not found!' });
+            }
+
+            res.json(result.rows[0]);
+        } catch (err) {
+            console.error('Error updating store:', err);
+            res.status(500).json({ message: 'Internal Server Error' });
         }
-
-        stores[storeIndex] = { ...stores[storeIndex], ...updatedData };
-        writeStores(stores);
-
-        console.log('Store updated:', stores[storeIndex]);
-        res.json(stores[storeIndex]);
     } else {
         res.status(401).send('Login required to update a store');
     }
 });
 
-// DELETE endpoint to remove a store by name from the stores.json file
-app.delete('/api/stores/:name', (req, res) => {
+// DELETE: Remove a store by name
+app.delete('/api/stores/:name', async (req, res) => {
     const token = req.signedCookies.authToken;
     if (token && sessions[token]) {
         const storeName = req.params.name;
 
-        const stores = readStores();
-        const storeIndex = stores.findIndex(store => store.name === storeName);
+        try {
+            const result = await pool.query(
+                'DELETE FROM stores WHERE name = $1 RETURNING *',
+                [storeName]
+            );
 
-        if (storeIndex === -1) {
-            return res.status(404).json({ message: 'Store not found!' });
+            if (result.rowCount === 0) {
+                return res.status(404).json({ message: 'Store not found!' });
+            }
+
+            res.json(result.rows[0]);
+        } catch (err) {
+            console.error('Error deleting store:', err);
+            res.status(500).json({ message: 'Internal Server Error' });
         }
-
-        const deletedStore = stores.splice(storeIndex, 1);
-        writeStores(stores);
-
-        console.log('Store deleted:', deletedStore);
-        res.json(deletedStore);
     } else {
         res.status(401).send('Login required to delete a store');
     }
 });
 
-// Start the server
+// Start server
 app.listen(5000, () => {
     console.log('Server running at http://localhost:5000');
 });

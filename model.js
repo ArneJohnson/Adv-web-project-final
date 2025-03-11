@@ -17,6 +17,8 @@ const pool = new Pool({
     database: "postgres"
 });
 
+module.exports = { pool };
+
 // // Handle POST request to insert a new store
 // app.post('/api/stores', async (req, res) => {
 //     const { name, district, url, hours, rating } = req.body;
