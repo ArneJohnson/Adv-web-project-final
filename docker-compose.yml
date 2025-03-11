@@ -1,30 +1,33 @@
-version: '3'
+version: '3.8'  # Definierar vilken version av Docker Compose syntaxen följer
 
 services:
-  app:
-    build: .
-    ports:
-      - "5001:5000"
+  database:
+    build:
+      context: .  # Använder nuvarande katalog
+      dockerfile: Dockerfile.database  # Bygger från en specifik Dockerfile
+    container_name: postgres_db  # Namn på containern
+    restart: always  # Containern startas om om den kraschar
     environment:
-      - DB_HOST=db  # Refers to the db service container
-      - DB_USER=${DB_USER}  # Uses the DB_USER variable from .env
-      - DB_PASSWORD=${DB_PASSWORD}  # Uses the DB_PASSWORD variable from .env
-      - DB_NAME=${DB_NAME}  # Uses the DB_NAME variable from .env
-      - DB_PORT=${DB_PORT}  # Uses the DB_PORT variable from .env
-    depends_on:
-      - db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"  # Kartlägger port 5432 från containern till host-maskinen
+    volumes:
+      - db_data:/var/lib/postgresql/data  # Sparar databasdata även efter omstart
 
-  db:
-    image: postgres:alpine
-    environment:
-      - POSTGRES_USER=${DB_USER}  # Uses the DB_USER variable from .env
-      - POSTGRES_PASSWORD=${DB_PASSWORD}  # Uses the DB_PASSWORD variable from .env
-      - POSTGRES_DB=${DB_NAME}  # Uses the DB_NAME variable from .env
+  frontend:
+    build:
+      context: .  
+      dockerfile: Dockerfile.frontend  
+    container_name: node_frontend  
+    restart: always  
     ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${DB_USER}", "-d", "${DB_NAME}"]
-      interval: 10s
-      retries: 5
-      start_period: 30s
-      timeout: 5s
+      - "5000:5000"  # Exponerar frontend-appen på port 8080
+    depends_on:
+      - database  # Säkerställer att databasen startas först
+    environment:
+      DATABASE_URL: "postgres://postgres:12345@database:5432/postgres"  # URL för att ansluta till databasen
+
+volumes:
+  db_data:  # Skapar en volym för databaslagring

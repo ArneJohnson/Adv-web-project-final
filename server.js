@@ -3,7 +3,7 @@ const path = require('path');
 const app = express();
 const cookieParser = require('cookie-parser');
 const crypto = require('crypto');
-const {testConnection, pool } = require('./models/model');
+const {pool} = require('./models/model.js');
 
 const SECRET = 'mySecretCookieToken';
 const sessions = {};
