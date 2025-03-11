@@ -1,35 +1,3 @@
-<<<<<<< Updated upstream
-version: '3'
-
-services:
-  app:
-    build: .
-    ports:
-      - "5001:5000"
-    environment:
-      - DB_HOST=db  # Refers to the db service container
-      - DB_USER=${DB_USER}  # Uses the DB_USER variable from .env
-      - DB_PASSWORD=${DB_PASSWORD}  # Uses the DB_PASSWORD variable from .env
-      - DB_NAME=${DB_NAME}  # Uses the DB_NAME variable from .env
-      - DB_PORT=${DB_PORT}  # Uses the DB_PORT variable from .env
-    depends_on:
-      - db
-
-  db:
-    image: postgres:alpine
-    environment:
-      - POSTGRES_USER=${DB_USER}  # Uses the DB_USER variable from .env
-      - POSTGRES_PASSWORD=${DB_PASSWORD}  # Uses the DB_PASSWORD variable from .env
-      - POSTGRES_DB=${DB_NAME}  # Uses the DB_NAME variable from .env
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${DB_USER}", "-d", "${DB_NAME}"]
-      interval: 10s
-      retries: 5
-      start_period: 30s
-      timeout: 5s
-=======
 services:
   database:
     build:
@@ -44,7 +12,8 @@ services:
     ports:
       - "5432:5432"  # Maps port 5432 from the container to the host machine
     volumes:
-      - db_data:/var/lib/postgresql/data  # Persists database data after restarts
+      - db_data:/var/lib/postgresql/data  # Persist data in a Docker volume
+      - ./stores.json:/usr/src/app/stores.json  # Mount the stores.json file
 
   frontend:
     build:
@@ -58,7 +27,13 @@ services:
       - database  # Ensures that the database starts before the frontend
     environment:
       DATABASE_URL: "postgres://postgres:12345@database:5432/postgres"  # URL to connect to the database
+    # Add a healthcheck to ensure the frontend waits for the database to be fully ready
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      retries: 3
+      start_period: 5s
+      timeout: 10s
 
 volumes:
   db_data:  # Creates a volume for database storage
->>>>>>> Stashed changes

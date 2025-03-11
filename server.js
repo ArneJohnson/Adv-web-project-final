@@ -3,22 +3,41 @@ const path = require('path');
 const app = express();
 const cookieParser = require('cookie-parser');
 const crypto = require('crypto');
-<<<<<<< Updated upstream
-const { testConnection, pool } = require('./models/model');
-=======
-const {pool} = require('./model.js');
->>>>>>> Stashed changes
+const fs = require('fs'); // To read and write the stores.json file
+const { pool } = require('./model.js');
 
 const SECRET = 'mySecretCookieToken';
 const sessions = {};
 
-app.use(cookieParser(SECRET));
-
 // Middleware to parse JSON request bodies
+app.use(cookieParser(SECRET));
 app.use(express.json());
 
 // Serve static files (index.html, styles.css, etc.)
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Path to the stores.json file
+const storesFilePath = path.join(__dirname, 'stores.json');
+
+// Function to read stores from the JSON file
+function readStores() {
+    try {
+        const data = fs.readFileSync(storesFilePath, 'utf8');
+        return JSON.parse(data); // Returns the stores data as an array
+    } catch (err) {
+        console.error('Error reading stores file:', err);
+        return []; // Return an empty array if there's an error
+    }
+}
+
+// Function to write stores to the JSON file
+function writeStores(stores) {
+    try {
+        fs.writeFileSync(storesFilePath, JSON.stringify(stores, null, 2), 'utf8');
+    } catch (err) {
+        console.error('Error writing stores file:', err);
+    }
+}
 
 // Login Route
 app.get('/login', (req, res) => {
@@ -54,39 +73,24 @@ app.get('/logout', (req, res) => {
     res.redirect('/');
 });
 
+// Home Route
 app.post('/', (req, res) => {
     const token = req.signedCookies.authToken;
     if (token && sessions[token]) {
-        res.send(`<!DOCTYPE html><html><head><title>Home</title></head><body><h1>Welcome, ${sessions[token].username}!</h1>);`);
-    }
-    else {
+        res.send(`<!DOCTYPE html><html><head><title>Home</title></head><body><h1>Welcome, ${sessions[token].username}!</h1></body></html>`);
+    } else {
         res.status(401).json({ message: 'Login required' });
     }
 });
 
-// GET endpoint to fetch all stores from the database
-app.get('/api/stores', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT * FROM stores');
-        res.json(result.rows);
-    } catch (err) {
-        console.error('Error fetching stores:', err);
-        res.status(500).json({ message: 'Failed to fetch stores' });
-    }
+// GET endpoint to fetch all stores from the stores.json file
+app.get('/api/stores', (req, res) => {
+    const stores = readStores();
+    res.json(stores);
 });
 
-app.get('/api/stores', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT * FROM stores');
-        res.json(result.rows); // This should be an array
-    } catch (err) {
-        console.error('Error fetching stores:', err);
-        res.status(500).json({ message: 'Failed to fetch stores' });
-    }
-});
-
-// POST endpoint to add a new store to the database
-app.post('/api/stores', async (req, res) => {
+// POST endpoint to add a new store to the stores.json file
+app.post('/api/stores', (req, res) => {
     const token = req.signedCookies.authToken;
     if (token && sessions[token]) {
         const { name, district, url, hours, rating } = req.body;
@@ -95,148 +99,64 @@ app.post('/api/stores', async (req, res) => {
             return res.status(400).json({ message: 'Name and location are required!' });
         }
 
-        const query = `
-        INSERT INTO stores (name, district, url, hours, rating)
-        VALUES ($1, $2, $3, $4, $5) RETURNING *;
-    `;
-        const values = [name, district, url, hours, rating];
+        const newStore = { name, district, url, hours, rating };
+        const stores = readStores();
+        stores.push(newStore);
+        writeStores(stores); // Save the updated stores array back to the file
 
-        try {
-            const result = await pool.query(query, values);
-            const newStore = result.rows[0]; // Get the inserted store object
-            console.log('New store added:', newStore);
-            res.status(201).json(newStore);
-        } catch (err) {
-            console.error('Error adding store:', err);
-            res.status(500).json({ message: 'Failed to add store' });
-        }
-    }
-    else {
+        console.log('New store added:', newStore);
+        res.status(201).json(newStore);
+    } else {
         res.status(401).send('Login required to add a store');
     }
 });
 
-// // GET endpoint to fetch all stores
-// app.get('/api/stores', (req, res) => {
-//     const stores = readStores();
-//     res.json(stores);
-// });
-
-// POST endpoint to add a new store
-// app.post('/api/stores', (req, res) => {
-//     const token = req.signedCookies.authToken;
-//     if (token && sessions[token]) {
-//         const newStore = req.body;
-
-//         if (!newStore.name || !newStore.district) {
-//             return res.status(400).json({ message: 'Name and location are required!' });
-//         }
-
-//         const stores = readStores();
-//         stores.push(newStore);
-//         writeStores(stores);
-
-//         console.log('New store added:', newStore); // Log the added store
-//         console.log('Stores after adding new store:', stores); // Debugging
-//         res.status(201).json(newStore);
-//     } else {
-//         res.status(401).send('Login required to add a store');
-//     }
-// });
-
-// PUT endpoint to update an existing store by name
-app.put('/api/stores/:name', async (req, res) => {
+// PUT endpoint to update an existing store by name in the stores.json file
+app.put('/api/stores/:name', (req, res) => {
     const token = req.signedCookies.authToken;
     if (token && sessions[token]) {
         const storeName = req.params.name;
         const updatedData = req.body;
 
-        const query = `
-        UPDATE stores
-        SET name = $1, district = $2, url = $3, hours = $4, rating = $5
-        WHERE name = $6 RETURNING *;
-    `;
-        const values = [
-            updatedData.name || storeName,
-            updatedData.district,
-            updatedData.url,
-            updatedData.hours,
-            updatedData.rating,
-            storeName
-        ];
+        const stores = readStores();
+        const storeIndex = stores.findIndex(store => store.name === storeName);
 
-        try {
-            const result = await pool.query(query, values);
-            if (result.rowCount === 0) {
-                return res.status(404).json({ message: 'Store not found!' });
-            }
-            res.json(result.rows[0]);
-        } catch (err) {
-            console.error('Error updating store:', err);
-            res.status(500).json({ message: 'Failed to update store' });
+        if (storeIndex === -1) {
+            return res.status(404).json({ message: 'Store not found!' });
         }
+
+        stores[storeIndex] = { ...stores[storeIndex], ...updatedData };
+        writeStores(stores);
+
+        console.log('Store updated:', stores[storeIndex]);
+        res.json(stores[storeIndex]);
     } else {
         res.status(401).send('Login required to update a store');
     }
 });
 
-// DELETE endpoint to remove a store by name
-app.delete('/api/stores/:name', async (req, res) => {
+// DELETE endpoint to remove a store by name from the stores.json file
+app.delete('/api/stores/:name', (req, res) => {
     const token = req.signedCookies.authToken;
     if (token && sessions[token]) {
         const storeName = req.params.name;
 
-        const query = `
-        DELETE FROM stores
-        WHERE name = $1 RETURNING *;
-    `;
-        const values = [storeName];
+        const stores = readStores();
+        const storeIndex = stores.findIndex(store => store.name === storeName);
 
-        try {
-            const result = await pool.query(query, values);
-            if (result.rowCount === 0) {
-                return res.status(404).json({ message: 'Store not found!' });
-            }
-            res.json(result.rows[0]);
-        } catch (err) {
-            console.error('Error deleting store:', err);
-            res.status(500).json({ message: 'Failed to delete store' });
-
-            // Update the store
-            const token = req.signedCookies.authToken;
-            if (token && sessions[token]) {
-                stores[storeIndex] = { ...stores[storeIndex], ...updatedData };
-                writeStores(stores);
-                res.json(stores[storeIndex]);
-            } else {
-                res.status(401).send('Login required to update a store');
-            }
+        if (storeIndex === -1) {
+            return res.status(404).json({ message: 'Store not found!' });
         }
+
+        const deletedStore = stores.splice(storeIndex, 1);
+        writeStores(stores);
+
+        console.log('Store deleted:', deletedStore);
+        res.json(deletedStore);
     } else {
         res.status(401).send('Login required to delete a store');
     }
 });
-
-// DELETE endpoint to remove a store by name
-// app.delete('/api/stores/:name', (req, res) => {
-//     const token = req.signedCookies.authToken;
-//     if (token && sessions[token]) {
-//         const storeName = req.params.name;
-//         const stores = readStores();
-//         const storeIndex = stores.findIndex(store => store.name === storeName);
-
-//         if (storeIndex === -1) {
-//             return res.status(404).json({ message: 'Store not found!' });
-//         }
-
-//         // Remove the store
-//         const deletedStore = stores.splice(storeIndex, 1);
-//         writeStores(stores);
-//         res.json(deletedStore);
-//     } else {
-//         res.status(401).send('Login required to delete a store');
-//     }
-// });
 
 // Start the server
 app.listen(5000, () => {

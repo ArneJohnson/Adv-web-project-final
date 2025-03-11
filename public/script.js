@@ -2,48 +2,52 @@ let currentStoreName = '';
 
 // Load stores and render them in the list
 async function loadStores() {
-    const response = await fetch("/api/stores");
-    if (!response.ok) {
-        console.error("Failed to load stores:", response.statusText);
-        return;
+    try {
+        const response = await fetch("/api/stores"); // Adjust URL if needed
+        if (!response.ok) {
+            throw new Error(`Failed to load stores: ${response.statusText}`);
+        }
+
+        const stores = await response.json();
+        console.log("Stores loaded:", stores); // Debugging output
+
+        getAdminMenu(); // Check if the user is logged in and add the admin menu
+
+        // Sort stores
+        const sortMethod = checkSort();
+        console.log("Sort method:", sortMethod); // Log the sort method to debug
+        if (sortMethod === "rating") {
+            stores.sort((a, b) => b.rating - a.rating);
+        } else if (sortMethod === "name") {
+            stores.sort((a, b) => a.name.localeCompare(b.name));
+        }
+
+        console.log("Stores after sorting:", stores); // Log stores after sorting
+
+        const venueList = document.getElementById("venue-list");
+        venueList.innerHTML = '';  // Clear the list before rendering
+
+        const editForm = document.getElementById("edit-store-form");
+        editForm.style.display = 'none'; // Hide the form
+
+        const nameHeader = document.getElementById("name-header");
+        nameHeader.innerText = '';
+        nameHeader.style.display = 'none'; // Hide the store name
+
+        stores.forEach(store => {
+            const li = document.createElement("li");
+            li.classList.add("venue-item");
+
+            li.innerHTML = `
+                <span onclick="editStore('${store.name}');">${store.name} ${store.district ? '- ' + store.district : ''}</span>
+                <button onclick="deleteStore('${store.name}')">Delete</button>
+            `;
+
+            venueList.appendChild(li);
+        });
+    } catch (error) {
+        console.error(error.message);  // Handle errors gracefully
     }
-
-    const stores = await response.json();
-
-    getAdminMenu(); // Check if the user is logged in and add the admin menu
-
-    // Sort stores
-    const sortMethod = checkSort();
-    console.log("Sort method:", sortMethod); // Log the sort method to debug
-    if (sortMethod === "rating") {
-        stores.sort((a, b) => b.rating - a.rating);
-    } else if (sortMethod === "name") {
-        stores.sort((a, b) => a.name.localeCompare(b.name));
-    }
-
-    console.log("Stores after sorting:", stores); // Log stores after sorting
-
-    const venueList = document.getElementById("venue-list");
-    venueList.innerHTML = '';  // Clear the list before rendering
-
-    const editForm = document.getElementById("edit-store-form");
-    editForm.style.display = 'none'; // Hide the form
-
-    const nameHeader = document.getElementById("name-header");
-    nameHeader.innerText = '';
-    nameHeader.style.display = 'none'; // Hide the store name
-
-    stores.forEach(store => {
-        const li = document.createElement("li");
-        li.classList.add("venue-item");
-
-        li.innerHTML = `
-            <span onclick="editStore('${store.name}');">${store.name} ${store.district ? '- ' + store.district : ''}</span>
-            <button onclick="deleteStore('${store.name}')">Delete</button>
-        `;
-
-        venueList.appendChild(li);
-    });
 }
 
 // Add a new store
@@ -56,60 +60,68 @@ async function addStore() {
 
     const newStore = { name, district: location, address, hours, rating };
 
-    const response = await fetch("http://localhost:5000/api/stores", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newStore),
-    });
+    try {
+        const response = await fetch("http://localhost:5000/api/stores", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newStore),
+        });
 
-    if (response.ok) {
-        loadStores();  // Reload the stores after adding a new one
-        window.location.href = 'index.html';  // Redirect to the index page after adding a store
-    } else {
-        alert('Error adding store');
+        if (response.ok) {
+            loadStores();  // Reload the stores after adding a new one
+            window.location.href = 'index.html';  // Redirect to the index page after adding a store
+        } else {
+            alert('Error adding store');
+        }
+    } catch (error) {
+        console.error("Error adding store:", error);
     }
 }
 
 // Edit an existing store
 async function editStore(storeName) {
     console.log(`Editing store: ${storeName}`);
-    const response = await fetch(`http://localhost:5000/api/stores/${storeName}`, {
-        method: "GET",
-    });
+    try {
+        const response = await fetch(`http://localhost:5000/api/stores/${storeName}`, {
+            method: "GET",
+        });
 
-    if (response.ok) {
-        const store = await response.json();
+        if (response.ok) {
+            const store = await response.json();
 
-        currentStoreName = storeName;  // Store the current store name
+            currentStoreName = storeName;  // Store the current store name
 
-        const venueList = document.getElementById("venue-list");
-        venueList.innerHTML = '';  // Clear the list before rendering
+            const venueList = document.getElementById("venue-list");
+            venueList.innerHTML = '';  // Clear the list before rendering
 
-        const editForm = document.getElementById("edit-store-form");
-        editForm.style.display = 'block';  // Show the form
+            const editForm = document.getElementById("edit-store-form");
+            editForm.style.display = 'block';  // Show the form
 
-        const nameHeader = document.getElementById("name-header");
-        nameHeader.innerText = `${storeName}`;
-        nameHeader.style.display = 'block';  // Show the store name
+            const nameHeader = document.getElementById("name-header");
+            nameHeader.innerText = `${storeName}`;
+            nameHeader.style.display = 'block';  // Show the store name
 
-        const storeHeader = document.getElementById("store-header");
-        storeHeader.style.display = 'none';  // Hide the store header
+            const storeHeader = document.getElementById("store-header");
+            storeHeader.style.display = 'none';  // Hide the store header
 
-        const addStoreButton = document.getElementById("add-store-btn");
-        addStoreButton.style.display = 'none';  // Hide the add store button
+            const addStoreButton = document.getElementById("add-store-btn");
+            addStoreButton.style.display = 'none';  // Hide the add store button
 
-        // Populate the form fields with the store's current data
-        document.getElementById("edit-store-name").value = store.name;
-        document.getElementById("edit-store-location").value = store.district || '';
-        document.getElementById("edit-store-address").value = store.address || '';
-        document.getElementById("edit-store-hours").value = store.hours || '';
-        document.getElementById("edit-store-rating").value = store.rating || '';
-    } else {
-        if (response.status === 401) {
-            alert('Login required to edit a store');
+            // Populate the form fields with the store's current data
+            document.getElementById("edit-store-name").value = store.name;
+            document.getElementById("edit-store-location").value = store.district || '';
+            document.getElementById("edit-store-address").value = store.address || '';
+            document.getElementById("edit-store-hours").value = store.hours || '';
+            document.getElementById("edit-store-rating").value = store.rating || '';
         } else {
-            alert('Error editing store', response);
+            if (response.status === 401) {
+                alert('Login required to edit a store');
+            } else {
+                alert('Error editing store', response);
+            }
         }
+    } catch (error) {
+        console.error("Error editing store:", error);
     }
 }
 
@@ -123,20 +135,24 @@ async function saveStore() {
 
     const updatedStore = { name, location, address, hours, rating };
 
-    const response = await fetch(`http://localhost:5000/api/stores/${currentStoreName}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedStore),
-    });
+    try {
+        const response = await fetch(`http://localhost:5000/api/stores/${currentStoreName}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedStore),
+        });
 
-    if (response.ok) {
-        loadStores();  // Reload the stores after updating
-    } else {
-        if (response.status === 401) {
-            alert('Login required to edit a store');
+        if (response.ok) {
+            loadStores();  // Reload the stores after updating
         } else {
-            alert('Error updating store', response);
+            if (response.status === 401) {
+                alert('Login required to edit a store');
+            } else {
+                alert('Error updating store', response);
+            }
         }
+    } catch (error) {
+        console.error("Error saving store:", error);
     }
 }
 
@@ -145,18 +161,22 @@ async function deleteStore(storeName) {
     const confirmDelete = confirm(`Are you sure you want to delete ${storeName}?`);
 
     if (confirmDelete) {
-        const response = await fetch(`http://localhost:5000/api/stores/${storeName}`, {
-            method: "DELETE",
-        });
+        try {
+            const response = await fetch(`http://localhost:5000/api/stores/${storeName}`, {
+                method: "DELETE",
+            });
 
-        if (response.ok) {
-            loadStores();  // Reload stores after deletion
-        } else {
-            if (response.status === 401) {
-                alert('Login required to delete a store');
+            if (response.ok) {
+                loadStores();  // Reload stores after deletion
             } else {
-                alert('Error deleting store');
+                if (response.status === 401) {
+                    alert('Login required to delete a store');
+                } else {
+                    alert('Error deleting store');
+                }
             }
+        } catch (error) {
+            console.error("Error deleting store:", error);
         }
     }
 }
@@ -191,16 +211,21 @@ function checkSort() {
     }
 }
 
-//Admin menu
+// Admin menu
 async function getAdminMenu() {
-    const response = await fetch(`http://localhost:5000/`, {
-        method: "POST",
-    });
+    try {
+        const response = await fetch(`http://localhost:5000/`, {
+            method: "POST",
+        });
 
-    if (response.status === 401) {
+        if (response.status === 401) {
+            hideAdminMenu();
+        } else {
+            showAdminMenu();
+        }
+    } catch (error) {
+        console.error("Error fetching admin menu:", error);
         hideAdminMenu();
-    } else {
-        showAdminMenu();
     }
 }
 
@@ -215,6 +240,7 @@ function showAdminMenu() {
     loginButton.style.display = 'none';
     adminHelpText.innerText = '*Click on the stores to edit them';
 }
+
 function hideAdminMenu() {
     const addStoreButton = document.getElementById("add-store-btn");
     const logoutButton = document.getElementById("logout-btn");
