@@ -9,10 +9,14 @@
   <body>
     <div class="hero" id="hero">
       <a href="/"><h1>Discover Jönköping</h1></a>
-      <p id="adminHelp">*Click on the stores to edit them</p>
-      <a href="new_store_form.html"
-        ><button id="add-store-btn">Add Store</button></a
-      >
+      <p id="adminHelp"></p>
+      <div id="sortButtons">
+        <a href="new_store_form.html" id="add-store-btn"
+          ><button>Add Store</button></a
+        >
+        <a href="/login" id="login-btn"><button>Log in</button></a>
+        <a href="/logout" id="logout-btn"><button>Log out</button></a>
+      </div>
       <div id="sortButtons">
         <button id="sortByRating" onclick="sortByRating()">
           Sort by Rating

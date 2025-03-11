@@ -259,6 +259,8 @@ button:active {
   margin: 20px;
 }
 
-#add-store-btn {
-  margin: 20px;
+#sortButtons {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
 }

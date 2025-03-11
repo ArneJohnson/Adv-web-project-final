@@ -5,6 +5,8 @@ async function loadStores() {
     const response = await fetch("http://localhost:5000/api/stores");
     const stores = await response.json();
 
+    getAdminMenu(); // Check if the user is logged in and add the admin menu
+
     // Sort stores
     const sortMethod = checkSort();
     if (sortMethod === "rating") {  // Sort by rating
@@ -23,9 +25,6 @@ async function loadStores() {
     const nameHeader = document.getElementById("name-header");
     nameHeader.innerText = ``;
     nameHeader.style.display = 'none'; // Hide the store name
-
-    const addStoreButton = document.getElementById("add-store-btn");
-    addStoreButton.style.display = 'block'; // Show the add store button
 
     stores.forEach(store => {
         const li = document.createElement("li");
@@ -107,7 +106,11 @@ async function editStore(storeName) {
         document.getElementById("edit-store-hours").value = store.hours || '';
         document.getElementById("edit-store-rating").value = store.rating || '';
     } else {
-        alert('Error editing store');
+        if (response.status === 401) {
+            alert('Login required to edit a store');
+        } else {
+            alert('Error editing store', response);
+        }
     }
 }
 
@@ -130,7 +133,11 @@ async function saveStore() {
     if (response.ok) {
         loadStores(); // Reload the stores after updating
     } else {
-        alert('Error updating store');
+        if (response.status === 401) {
+            alert('Login required to edit a store');
+        } else {
+            alert('Error updating store', response);
+        }
     }
 }
 
@@ -146,7 +153,11 @@ async function deleteStore(storeName) {
         if (response.ok) {
             loadStores(); // Reload stores after deletion
         } else {
-            alert('Error deleting store');
+            if (response.status === 401) {
+                alert('Login required to delete a store');
+            } else {
+                alert('Error deleting store');
+            }
         }
     }
 }
@@ -179,6 +190,42 @@ function checkSort() {
     } else {
         return null;
     }
+}
+
+//Admin menu
+async function getAdminMenu() {
+    const response = await fetch(`http://localhost:5000/`, {
+        method: "POST",
+    });
+
+    if (response.status === 401) {
+        hideAdminMenu();
+    } else {
+        showAdminMenu();
+    }
+}
+
+function showAdminMenu() {
+    const addStoreButton = document.getElementById("add-store-btn");
+    const logoutButton = document.getElementById("logout-btn");
+    const loginButton = document.getElementById("login-btn");
+    const adminHelpText = document.getElementById("adminHelp");
+
+    addStoreButton.style.display = 'block';
+    logoutButton.style.display = 'block';
+    loginButton.style.display = 'none';
+    adminHelpText.innerText = '*Click on the stores to edit them';
+}
+function hideAdminMenu() {
+    const addStoreButton = document.getElementById("add-store-btn");
+    const logoutButton = document.getElementById("logout-btn");
+    const loginButton = document.getElementById("login-btn");
+    const adminHelpText = document.getElementById("adminHelp");
+
+    addStoreButton.style.display = 'none';
+    logoutButton.style.display = 'none';
+    loginButton.style.display = 'block';
+    adminHelpText.innerText = '';
 }
 
 // Load stores when the page is loaded
