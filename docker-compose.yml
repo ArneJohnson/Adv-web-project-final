@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 version: '3'
 
 services:
@@ -28,3 +29,36 @@ services:
       retries: 5
       start_period: 30s
       timeout: 5s
+=======
+services:
+  database:
+    build:
+      context: .  # Uses the current directory
+      dockerfile: Dockerfile.database  # Builds from a specific Dockerfile
+    container_name: postgres_db  # Name of the container
+    restart: always  # Container will restart if it crashes
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"  # Maps port 5432 from the container to the host machine
+    volumes:
+      - db_data:/var/lib/postgresql/data  # Persists database data after restarts
+
+  frontend:
+    build:
+      context: .  # Uses the current directory
+      dockerfile: Dockerfile.frontend  # Builds from a specific Dockerfile
+    container_name: node_frontend  # Name of the container
+    restart: always  # Container will restart if it crashes
+    ports:
+      - "5000:5000"  # Exposes frontend app on port 5000
+    depends_on:
+      - database  # Ensures that the database starts before the frontend
+    environment:
+      DATABASE_URL: "postgres://postgres:12345@database:5432/postgres"  # URL to connect to the database
+
+volumes:
+  db_data:  # Creates a volume for database storage
+>>>>>>> Stashed changes

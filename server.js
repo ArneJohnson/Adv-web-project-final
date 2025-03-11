@@ -3,7 +3,11 @@ const path = require('path');
 const app = express();
 const cookieParser = require('cookie-parser');
 const crypto = require('crypto');
+<<<<<<< Updated upstream
 const { testConnection, pool } = require('./models/model');
+=======
+const {pool} = require('./model.js');
+>>>>>>> Stashed changes
 
 const SECRET = 'mySecretCookieToken';
 const sessions = {};
@@ -65,6 +69,16 @@ app.get('/api/stores', async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM stores');
         res.json(result.rows);
+    } catch (err) {
+        console.error('Error fetching stores:', err);
+        res.status(500).json({ message: 'Failed to fetch stores' });
+    }
+});
+
+app.get('/api/stores', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM stores');
+        res.json(result.rows); // This should be an array
     } catch (err) {
         console.error('Error fetching stores:', err);
         res.status(500).json({ message: 'Failed to fetch stores' });

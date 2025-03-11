@@ -1,5 +1,45 @@
 [
   {
+    "name": "Åhlens",
+    "url": "ahlens.se/varuhus/jonkoping?utm_source=google&utm_medium=organic&utm_campaign=business_profile&utm_content=website_link",
+    "district": "Öster"
+  },
+  {
+    "name": "Akademibokhandeln",
+    "url": "akademibokhandeln.se/butik/jonkoping-c",
+    "district": "Öster"
+  },
+  {
+    "name": "Apoteket AB",
+    "url": "apoteket.se/apotek/apoteket-ostra-storgatan-jonkoping/",
+    "district": null
+  },
+  {
+    "name": "Apotek Hjärtat",
+    "url": "apotekhjartat.se/hitta-apotek-hjartat/jonkoping/apotek_hjartat_smedjegatan_2_jonkoping/",
+    "district": null
+  },
+  {
+    "name": "Ashur Brud & Fest - Skrädderi",
+    "url": "facebook.com/AshuraitaBrudFest/",
+    "district": null
+  },
+  {
+    "name": "Asia livs, servicebutik",
+    "url": "facebook.com/profile.php?id=100051215441977",
+    "district": null
+  },
+  {
+    "name": "Ateljé Creativ i Jönköping/Finrummet",
+    "url": "/finrummet.net",
+    "district": "Väster"
+  },
+  {
+    "name": "Ateljé KEG",
+    "url": "ateljekeg.se",
+    "district": "Öster"
+  },
+  {
     "name": "Atlantis Dive College",
     "url": "atlantis.se",
     "district": "Väster"
@@ -47,6 +87,16 @@
   {
     "name": "Broder Bläck",
     "url": "facebook.com/broderblacktatuering/",
+    "district": "Öster"
+  },
+  {
+    "name": "Buketten",
+    "url": "instagram.com/bukettenjonkoping/?hl=sv",
+    "district": "Öster"
+  },
+  {
+    "name": "Busfrö Nytt & Bytt",
+    "url": "busfro.se",
     "district": "Öster"
   },
   {
@@ -158,6 +208,11 @@
     "name": "Friendly Corner",
     "url": "https://friendlycorner.se/butiken",
     "district": "Tändsticksområdet"
+  },
+  {
+    "name": "Galleri 701 ramcenter",
+    "url": "galleri701-ram.se",
+    "district": null
   },
   {
     "name": "Gant",
@@ -560,7 +615,7 @@
     "district": "Öster"
   },
   {
-    "name": "Storyyyyyy",
+    "name": "Story",
     "url": "storyjkpg.se",
     "district": "Atollen"
   },
@@ -575,29 +630,68 @@
     "district": null
   },
   {
+    "name": "Synsam Jönköping Öster",
+    "url": "synsam.se/optiker/synsam-j%C3%B6nk%C3%B6ping-%C3%B6ster/128",
+    "district": "Öster"
+  },
+  {
+    "name": "Synsam Jönköping Väster",
+    "url": "synsam.se/optiker/synsam-j%C3%B6nk%C3%B6ping-v%C3%A4ster/125",
+    "district": "Väster"
+  },
+  {
     "name": "Systembolaget",
     "url": "systembolaget.se/butiker-ombud/",
     "district": "Öster"
   },
   {
-    "name": "1",
-    "district": "2",
-    "address": "3",
-    "hours": "4",
-    "rating": "5"
+    "name": "The Body Shop",
+    "url": "thebodyshop.com/sv-se/store-details/jonkoping-smedjegatan/3801?utm_source=google&utm_medium=organic-local&utm_campaign=yext&utm_content=3801",
+    "district": "Öster"
   },
   {
-    "name": "2",
-    "district": "3",
-    "address": "4",
-    "hours": "5",
-    "rating": "1"
+    "name": "Ticket",
+    "url": "ticket.se/resebutiker/jonkoping.html",
+    "district": null
   },
   {
-    "name": "3",
-    "district": "4",
-    "address": "5",
-    "hours": "5",
-    "rating": "5"
+    "name": "Twilfit",
+    "url": "shop.change.com/sv-SE",
+    "district": "Öster"
+  },
+  {
+    "name": "Ur & Penn",
+    "url": "uropenn.se/hitta-butik/",
+    "district": "Öster"
+  },
+  {
+    "name": "Västanhem Butik",
+    "url": "vastanhem.se",
+    "district": "Väster"
+  },
+  {
+    "name": "Västra klackbaren",
+    "url": null,
+    "district": null
+  },
+  {
+    "name": "Vätterbygden Ankarbergs Begravningsbyrå",
+    "url": "ankarbergs.se/",
+    "district": null
+  },
+  {
+    "name": "Vätterfisk",
+    "url": "xn--vtterfisk-v2a.se/",
+    "district": "Väster"
+  },
+  {
+    "name": "Yxhage Lås och Larm",
+    "url": "yxhage.se/",
+    "district": null
+  },
+  {
+    "name": "Zephyr Tattoo Parlour",
+    "url": "zephyrtattoo.se",
+    "district": "Öster"
   }
 ]
