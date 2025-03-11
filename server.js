@@ -1,13 +1,11 @@
 const express = require('express');
-const fs = require('fs');
 const path = require('path');
 const app = express();
 const cookieParser = require('cookie-parser');
 const crypto = require('crypto');
-const port = 5000;
+const {testConnection, pool } = require('./models/model');
 
 const SECRET = 'mySecretCookieToken';
-
 const sessions = {};
 
 app.use(cookieParser(SECRET));
@@ -18,26 +16,7 @@ app.use(express.json());
 // Serve static files (index.html, styles.css, etc.)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Path to the JSON file (your "database")
-const storesFilePath = path.join(__dirname, 'stores.json');
-
-// Helper function to read stores data from the JSON file
-function readStores() {
-    try {
-        const data = fs.readFileSync(storesFilePath);
-        return JSON.parse(data);
-    } catch (error) {
-        // Return an empty array if there's an error reading the file
-        return [];
-    }
-}
-
-// Helper function to write stores data to the JSON file
-function writeStores(stores) {
-    fs.writeFileSync(storesFilePath, JSON.stringify(stores, null, 2));
-}
-
-// Login
+// Login Route
 app.get('/login', (req, res) => {
     res.send(`<!DOCTYPE html><html><head><title>Login</title></head><body><h1>Login</h1>
 <form method="POST" action="/login">
@@ -49,77 +28,108 @@ app.get('/login', (req, res) => {
 </form><p><a href="/">Home</a></p></body></html>`);
 });
 
-app.post('/login', express.urlencoded({ extended: true }), (req, res) => { //POST /login route
+app.post('/login', express.urlencoded({ extended: true }), (req, res) => {
     const { username, password } = req.body;
-    if (username === 'admin' && password === 'password') { // In a real-world validate credentials against a database
-        const token = crypto.randomBytes(64).toString('hex'); // Generate a secure random token
-        sessions[token] = { username }; // Store the token along with user data in our session store
-        res.cookie('authToken', token, { signed: true, httpOnly: true }); // Set a signed, HTTP-only cookie with the token
-        res.redirect('/'); // Redirect the user to the default route after successful login
+    if (username === 'admin' && password === 'password') {
+        const token = crypto.randomBytes(64).toString('hex');
+        sessions[token] = { username };
+        res.cookie('authToken', token, { signed: true, httpOnly: true });
+        res.redirect('/');
     } else {
-        res.status(401).send(`Login Error: Invalid credentials. Please try again.`);
+        res.status(401).send('Login Error: Invalid credentials.');
     }
 });
 
-// GET endpoint to fetch all stores
-app.get('/api/stores', (req, res) => {
-    const stores = readStores();
-    res.json(stores);
+// GET endpoint to fetch all stores from the database
+app.get('/api/stores', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM stores');
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Error fetching stores:', err);
+        res.status(500).json({ message: 'Failed to fetch stores' });
+    }
 });
 
-// POST endpoint to add a new store
-app.post('/api/stores', (req, res) => {
-    const newStore = req.body;
+// POST endpoint to add a new store to the database
+app.post('/api/stores', async (req, res) => {
+    const { name, district, url, hours, rating } = req.body;
 
-    if (!newStore.name || !newStore.district) {
+    if (!name || !district) {
         return res.status(400).json({ message: 'Name and location are required!' });
     }
 
-    const stores = readStores();
-    stores.push(newStore);
-    writeStores(stores);
+    const query = `
+        INSERT INTO stores (name, district, url, hours, rating)
+        VALUES ($1, $2, $3, $4, $5) RETURNING *;
+    `;
+    const values = [name, district, url, hours, rating];
 
-    console.log('New store added:', newStore); // Log the added store
-    console.log('Stores after adding new store:', stores); // Debugging
-    res.status(201).json(newStore);
+    try {
+        const result = await pool.query(query, values);
+        const newStore = result.rows[0]; // Get the inserted store object
+        console.log('New store added:', newStore);
+        res.status(201).json(newStore);
+    } catch (err) {
+        console.error('Error adding store:', err);
+        res.status(500).json({ message: 'Failed to add store' });
+    }
 });
 
-
 // PUT endpoint to update an existing store by name
-app.put('/api/stores/:name', (req, res) => {
+app.put('/api/stores/:name', async (req, res) => {
     const storeName = req.params.name;
     const updatedData = req.body;
 
-    const stores = readStores();
-    const storeIndex = stores.findIndex(store => store.name === storeName);
+    const query = `
+        UPDATE stores
+        SET name = $1, district = $2, url = $3, hours = $4, rating = $5
+        WHERE name = $6 RETURNING *;
+    `;
+    const values = [
+        updatedData.name || storeName, 
+        updatedData.district, 
+        updatedData.url, 
+        updatedData.hours, 
+        updatedData.rating, 
+        storeName
+    ];
 
-    if (storeIndex === -1) {
-        return res.status(404).json({ message: 'Store not found!' });
+    try {
+        const result = await pool.query(query, values);
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Store not found!' });
+        }
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error('Error updating store:', err);
+        res.status(500).json({ message: 'Failed to update store' });
     }
-
-    // Update the store
-    stores[storeIndex] = { ...stores[storeIndex], ...updatedData };
-    writeStores(stores);
-    res.json(stores[storeIndex]);
 });
 
 // DELETE endpoint to remove a store by name
-app.delete('/api/stores/:name', (req, res) => {
+app.delete('/api/stores/:name', async (req, res) => {
     const storeName = req.params.name;
-    const stores = readStores();
-    const storeIndex = stores.findIndex(store => store.name === storeName);
 
-    if (storeIndex === -1) {
-        return res.status(404).json({ message: 'Store not found!' });
+    const query = `
+        DELETE FROM stores
+        WHERE name = $1 RETURNING *;
+    `;
+    const values = [storeName];
+
+    try {
+        const result = await pool.query(query, values);
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Store not found!' });
+        }
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error('Error deleting store:', err);
+        res.status(500).json({ message: 'Failed to delete store' });
     }
-
-    // Remove the store
-    const deletedStore = stores.splice(storeIndex, 1);
-    writeStores(stores);
-    res.json(deletedStore);
 });
 
 // Start the server
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+app.listen(5000, () => {
+    console.log('Server running at http://localhost:5000');
 });

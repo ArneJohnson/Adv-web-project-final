@@ -1,9 +1,10 @@
 document.getElementById('store-form').addEventListener('submit', async (event) => {
     event.preventDefault();
 
+    // Get values from form
     const name = document.getElementById('store-name').value;
     const district = document.getElementById('store-location').value;
-    const address = document.getElementById('store-address').value;
+    const url = document.getElementById('store-address').value;  // Change 'address' to 'url' for consistency with the database
     const hours = document.getElementById('store-hours').value;
     const rating = document.getElementById('store-rating').value;
 
@@ -11,12 +12,13 @@ document.getElementById('store-form').addEventListener('submit', async (event) =
     const storeData = {
         name: name,
         district: district,
-        address: address,
+        url: url,  // Change 'address' to 'url'
         hours: hours,
         rating: rating
     };
 
     try {
+        // Send the data to the backend
         const response = await fetch('/api/stores', {
             method: 'POST',
             headers: {
@@ -25,6 +27,7 @@ document.getElementById('store-form').addEventListener('submit', async (event) =
             body: JSON.stringify(storeData)
         });
 
+        // Handle the server response
         const result = await response.json();
 
         if (response.ok) {
