@@ -30,25 +30,124 @@ function readStores() {
     }
 }
 
-// Function to write stores to the JSON file
-// function writeStores(stores) {
-//     try {
-//         fs.writeFileSync(storesFilePath, JSON.stringify(stores, null, 2), 'utf8');
-//     } catch (err) {
-//         console.error('Error writing stores file:', err);
-//     }
-// }
-
 // Login Route
 app.get('/login', (req, res) => {
-    res.send(`<!DOCTYPE html><html><head><title>Login</title></head><body><h1>Login</h1>
-<form method="POST" action="/login">
-<label for="username">Username:</label>
-<input type="text" name="username" id="username" required /><br/><br/>
-<label for="password">Password:</label>
-<input type="password" name="password" id="password" required /><br/><br/>
-<button type="submit">Login</button>
-</form><p><a href="/">Home</a></p></body></html>`);
+    res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f4f4f4;
+            color: #111;
+            font-family: "Courier New", Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+            background: #fff;
+            border: 4px solid black;
+            box-shadow: 8px 8px 0 black;
+            width: 400px;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            border-bottom: 4px solid black;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #fff;
+            padding: 20px;
+            border: 4px solid black;
+            box-shadow: 8px 8px 0 black;
+            text-align: center;
+        }
+
+        input {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 1rem;
+            padding: 10px;
+            border: 3px solid black;
+            box-shadow: 4px 4px 0 black;
+            outline: none;
+            width: 100%;
+        }
+
+        input:focus {
+            border-color: #ffcc00;
+            box-shadow: 4px 4px 0 #ffcc00;
+        }
+
+        button {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            background: black;
+            color: white;
+            border: 4px solid white;
+            padding: 12px 24px;
+            cursor: pointer;
+            box-shadow: 6px 6px 0 black;
+            transition: transform 0.1s, background 0.2s, color 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            background: #ffcc00;
+            color: black;
+            transform: translate(-2px, -2px);
+            box-shadow: 8px 8px 0 black;
+        }
+
+        p {
+            margin-top: 35px;
+        }
+
+        a {
+            text-decoration: none;
+            font-weight: bold;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Login</h2>
+        <form method="POST" action="/login">
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username" required />
+            
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" required />
+            
+            <button type="submit">Login</button>
+        </form>
+        <a href="/"><p>Home</p></a>
+    </div>
+</body>
+</html>`);
 });
 
 app.post('/login', express.urlencoded({ extended: true }), (req, res) => {

@@ -40,7 +40,7 @@ async function loadStores() {
 
             li.innerHTML = `
                 <span onclick="editStore('${store.name}');">${store.name} ${store.district ? '- ' + store.district : ''}</span>
-                <button onclick="deleteStore('${store.name}')">Delete</button>
+                <button class="delete-btn" onclick="deleteStore('${store.name}')">Delete</button>
             `;
 
             venueList.appendChild(li);
@@ -182,13 +182,6 @@ async function deleteStore(storeName) {
     }
 }
 
-// Open the form for adding a new store
-// document.getElementById("add-store-btn").addEventListener("click", function () {
-//     currentStoreName = '';
-//     document.getElementById("form-title").innerText = "Add a New Store";
-//     document.getElementById("add-store-form").style.display = 'block';
-// });
-
 // Store Sorting
 function sortByRating() {
     document.getElementById("sortByRating").classList.toggle("active");
@@ -234,24 +227,32 @@ function showAdminMenu() {
     const addStoreButton = document.getElementById("add-store-btn");
     const logoutButton = document.getElementById("logout-btn");
     const loginButton = document.getElementById("login-btn");
+    const deleteButtons = document.querySelectorAll(".delete-btn")
     const adminHelpText = document.getElementById("adminHelp");
 
     addStoreButton.style.display = 'block';
     logoutButton.style.display = 'block';
     loginButton.style.display = 'none';
+    deleteButtons.forEach(button => {
+        button.style.display = 'block';
+    });
     adminHelpText.innerText = '*Click on the stores to edit them';
+
 }
 
 function hideAdminMenu() {
     const addStoreButton = document.getElementById("add-store-btn");
     const logoutButton = document.getElementById("logout-btn");
     const loginButton = document.getElementById("login-btn");
+    const deleteButtons = document.querySelectorAll(".delete-btn")
     const adminHelpText = document.getElementById("adminHelp");
 
     addStoreButton.style.display = 'none';
     logoutButton.style.display = 'none';
     loginButton.style.display = 'block';
-    adminHelpText.innerText = '';
+    deleteButtons.forEach(button => {
+        button.style.display = 'none';
+    });    adminHelpText.innerText = '';
 }
 
 // Load stores when the page is loaded
