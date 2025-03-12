@@ -19,17 +19,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Path to the stores.json file
 const storesFilePath = path.join(__dirname, 'stores.json');
 
-// Function to read stores from the JSON file
-function readStores() {
-    try {
-        const data = fs.readFileSync(storesFilePath, 'utf8');
-        return JSON.parse(data); // Returns the stores data as an array
-    } catch (err) {
-        console.error('Error reading stores file:', err);
-        return []; // Return an empty array if there's an error
-    }
-}
-
 // Login Route
 app.get('/login', (req, res) => {
     res.send(`<!DOCTYPE html>
@@ -198,9 +187,10 @@ app.post('/api/stores', async (req, res) => {
     const token = req.signedCookies.authToken;
     if (token && sessions[token]) {
         const { name, district, url, hours, rating } = req.body;
-        if (!name || !district) {
-            return res.status(400).json({ message: 'Name and district are required!' });
+        if (!name || !district || !rating) {
+            return res.status(400).json({ message: 'Name, district & rating are required!' });
         }
+
         try {
             const result = await pool.query(
                 'INSERT INTO stores (name, district, url, hours, rating) VALUES ($1, $2, $3, $4, $5) RETURNING *',
@@ -224,6 +214,7 @@ app.put('/api/stores/:name', async (req, res) => {
         const { district, url, hours, rating } = req.body;
 
         try {
+            // Update the store in the database
             const result = await pool.query(
                 'UPDATE stores SET district = COALESCE($1, district), url = COALESCE($2, url), hours = COALESCE($3, hours), rating = COALESCE($4, rating) WHERE name = $5 RETURNING *',
                 [district, url, hours, rating, storeName]
@@ -233,13 +224,19 @@ app.put('/api/stores/:name', async (req, res) => {
                 return res.status(404).json({ message: 'Store not found!' });
             }
 
+            // Respond with the updated store data
+            // return res.status(200).json({
+            //     message: 'Store successfully updated in database.',
+            //     updatedStore: result.rows[0]
+            //});
             res.json(result.rows[0]);
+
         } catch (err) {
             console.error('Error updating store:', err);
-            res.status(500).json({ message: 'Internal Server Error' });
+            return res.status(500).json({ message: 'Internal Server Error' });
         }
     } else {
-        res.status(401).send('Login required to update a store');
+        return res.status(401).send('Login required to update a store');
     }
 });
 

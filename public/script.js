@@ -3,26 +3,26 @@ let currentStoreName = '';
 // Load stores and render them in the list
 async function loadStores() {
     try {
-        const response = await fetch("/api/stores"); // Adjust URL if needed
+        const response = await fetch("/api/stores");
         if (!response.ok) {
             throw new Error(`Failed to load stores: ${response.statusText}`);
         }
 
         const stores = await response.json();
-        console.log("Stores loaded:", stores); // Debugging output
+        console.log("Stores loaded:", stores);
 
         getAdminMenu(); // Check if the user is logged in and add the admin menu
 
         // Sort stores
         const sortMethod = checkSort();
-        console.log("Sort method:", sortMethod); // Log the sort method to debug
+        console.log("Sort method:", sortMethod);
         if (sortMethod === "rating") {
             stores.sort((a, b) => b.rating - a.rating);
         } else if (sortMethod === "name") {
             stores.sort((a, b) => a.name.localeCompare(b.name));
         }
 
-        console.log("Stores after sorting:", stores); // Log stores after sorting
+        console.log("Stores after sorting:", stores);
 
         const venueList = document.getElementById("venue-list");
         venueList.innerHTML = '';  // Clear the list before rendering
@@ -89,6 +89,7 @@ async function editStore(storeName) {
 
         if (response.ok) {
             const store = await response.json();
+            console.log(store);
 
             currentStoreName = storeName;  // Store the current store name
 
@@ -113,7 +114,7 @@ async function editStore(storeName) {
             document.getElementById("edit-store-location").value = store.district || '';
             document.getElementById("edit-store-address").value = store.url || '';
             document.getElementById("edit-store-hours").value = store.hours || '';
-            document.getElementById("edit-store-rating").value = store.rating || '';
+            document.getElementById("edit-store-rating").value = store.rating || ''; //prevents undefined or null from being assigned
         } else {
             if (response.status === 401) {
                 alert('Login required to edit a store');
@@ -255,5 +256,4 @@ function hideAdminMenu() {
     });    adminHelpText.innerText = '';
 }
 
-// Load stores when the page is loaded
 loadStores();

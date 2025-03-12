@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const hours = document.getElementById('store-hours').value;
         const rating = document.getElementById('store-rating').value;
 
-        // Prepare the data to be sent to the server
+        // Prepare the data to be sent to the server, stored as an object
         const storeData = {
             name: name,
             district: district,
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(storeData)
+                body: JSON.stringify(storeData) //converts the object to a JSON string
             });
 
             // Handle the server response
@@ -33,7 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 alert('Store added successfully!');
-                // Redirect back to the index.html page
                 window.location.href = '/index.html';
             } else {
                 alert(`Error: ${result.message}`);
